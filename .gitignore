@@ -6,3 +6,5 @@ build/
 
 debian/.debhelper/
 debian/lokinet/
+
+lokinet-win32.exe

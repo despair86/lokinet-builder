@@ -47,6 +47,7 @@ InternalCompressLevel=ultra64
 MinVersion=0,5.0
 ; uncomment if you are shipping the 64-bit build
 ;ArchitecturesInstallIn64BitMode=x64
+VersionInfoCopyright=Copyright ©2018 Loki Project
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
