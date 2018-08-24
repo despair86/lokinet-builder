@@ -1,8 +1,7 @@
 build/
 *~
-*.exe
 *.so
 *.a
-
 debian/.debhelper/
 debian/lokinet/
+lokinet-win32.exe

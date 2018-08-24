@@ -36,6 +36,18 @@ OutputDir={#DevPath}win32-setup
 OutputBaseFilename=lokinet-win32
 Compression=lzma
 SolidCompression=yes
+VersionInfoVersion=0.0.3
+VersionInfoCompany=Loki Project
+VersionInfoDescription=lokinet installer for win32
+VersionInfoTextVersion=0.0.3
+VersionInfoProductName=loki-network
+VersionInfoProductVersion=0.0.3
+VersionInfoProductTextVersion=0.0.3
+InternalCompressLevel=ultra64
+MinVersion=0,5.0
+; uncomment if you are shipping the 64-bit build
+;ArchitecturesInstallIn64BitMode=x64
+VersionInfoCopyright=Copyright ©2018 Loki Project
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -48,9 +60,16 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 Source: "{#DevPath}build\lokinet.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#DevPath}daemon.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#DevPath}build\dns.exe"; DestDir: "{app}"; Flags: ignoreversion
+; comment these for 64-bit builds
 Source: "{#DevPath}build\libgcc_s_sjlj-1.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#DevPath}build\libstdc++-6.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#DevPath}build\libwinpthread-1.dll"; DestDir: "{app}"; Flags: ignoreversion
+; end
+; uncomment these for 64-bit builds
+;Source: "{#DevPath}build\libgcc_s_seh-1.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#DevPath}build\libstdc++-6.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#DevPath}build\libwinpthread-1.dll"; DestDir: "{app}"; Flags: ignoreversion
+; end
 Source: "{#DevPath}build\llarpc.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#DevPath}build\rcutil.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; delet this after finishing setup, we only need it to extract the drivers
@@ -79,11 +98,14 @@ begin
      (Version.Major < 6) and
      (Version.Minor = 0) then
   begin
-  // Select the appropriate driver
+    // Windows 2000, XP, .NET Svr 2003
+    // these have a horribly crippled WinInet that issues Triple-DES as its most secure
+    // cipher suite
     idpAddFile('http://www.rvx86.net/files/tuntapv9.7z', ExpandConstant('{tmp}\tuntapv9.7z'));
   end
   else
   begin
+    // current versions of windows :-)
     idpAddFile('https://github.com/despair86/lokinet-builder/raw/master/contrib/tuntapv9-ndis/tap-windows-9.21.2.7z', ExpandConstant('{tmp}\tuntapv9_n6.7z'));
   end;
     idpDownloadAfter(wpReady);
