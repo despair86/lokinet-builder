@@ -1,5 +1,6 @@
+# lokinet builder for windows
 
-## Building on Windows (mingw-w64 native, or wow64/linux/unix cross-compiler)
+## Building for Windows (mingw-w64 native, or wow64/linux/unix cross-compiler)
 
     #i686 or x86_64
     #if cross-compiling from anywhere other than wow64, export CC and CXX to
