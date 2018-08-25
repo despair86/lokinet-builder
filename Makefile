@@ -26,6 +26,7 @@ CROSS_CC ?=$(CROSS_TARGET)-gcc
 CROSS_CXX ?=$(CROSS_TARGET)-g++
 
 MINGW_TOOLCHAIN = $(REPO)/contrib/cross/mingw.cmake
+MINGW_WOW64_TOOLCHAIN = $(REPO)/contrib/cross/mingw32.cmake
 
 ANDROID_DIR=$(REPO)/android
 JNI_DIR=$(ANDROID_DIR)/jni
@@ -143,6 +144,22 @@ windows-sodium: ensure
 	cd $(SODIUM_SRC) && $(SODIUM_SRC)/autogen.sh
 	cd $(SODIUM_BUILD) && $(SODIUM_CONFIG) --prefix=$(DEP_PREFIX) --enable-static --disable-shared --host=x86_64-w64-mingw32
 	$(MAKE) -C $(SODIUM_BUILD) install
+
+wow64-sodium: ensure
+	cd $(SODIUM_SRC); $(SODIUM_SRC)/autogen.sh
+	cd $(SODIUM_BUILD); $(SODIUM_CONFIG) --prefix=$(DEP_PREFIX) --enable-static --disable-shared --host=i686-w64-mingw32
+	$(MAKE) -C $(SODIUM_BUILD) install
+
+legacy-wow64: wow64-sodium
+	cd $(WIN_BUILD_DIR) && cmake $(LLARPD_SRC) -DSTATIC_LINK=ON -DSODIUM_LIB=$(SODIUM_LIB) -DSODIUM_INCLUDE_DIR=$(DEP_PREFIX)/include -DCMAKE_TOOLCHAIN_FILE=$(MINGW_WOW64_TOOLCHAIN) -DHAVE_CXX17_FILESYSTEM=ON -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
+	$(MAKE) -C $(WIN_BUILD_DIR)
+	cp $(WIN_BUILD_DIR)/lokinet.exe $(EXE).exe
+
+wow64-release: wow64-sodium
+	cd $(WIN_BUILD_DIR) && cmake $(LLARPD_SRC) -DSTATIC_LINK=ON -DSODIUM_LIBRARIES=$(SODIUM_LIB) -DSODIUM_INCLUDE_DIR=$(DEP_PREFIX)/include -DCMAKE_TOOLCHAIN_FILE=$(MINGW_WOW64_TOOLCHAIN) -DHAVE_CXX17_FILESYSTEM=ON -DCMAKE_BUILD_TYPE=Release -DRELEASE_MOTTO="$(shell cat $(MOTTO))"
+	$(MAKE) -C $(WIN_BUILD_DIR)
+	cp $(WIN_BUILD_DIR)/lokinet.exe $(EXE).exe
+	gpg --sign --detach $(EXE).exe
 
 windows: windows-sodium
 	cd $(WIN_BUILD_DIR) && cmake $(LLARPD_SRC) -DSTATIC_LINK=ON -DSODIUM_LIBRARIES=$(SODIUM_LIB) -DSODIUM_INCLUDE_DIR=$(DEP_PREFIX)/include -DCMAKE_TOOLCHAIN_FILE=$(MINGW_TOOLCHAIN) -DHAVE_CXX17_FILESYSTEM=ON -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
