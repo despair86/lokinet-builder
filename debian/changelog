@@ -1,5 +1,6 @@
-lokinet (0.0.3) UNRELEASED; urgency=medium
+lokinet (0.1.0) UNRELEASED; urgency=medium
 
+  [ Jeff Becker (probably not evil) ]
   * MANDITORY UPGRADE FOR TOYNET
 
   * use sntrup for introset public key (backwards incompatable)
@@ -36,9 +37,11 @@ lokinet (0.0.3) UNRELEASED; urgency=medium
 
   * android port
 
-  * android glue code ( will be moved later )
+  * android glue code ( will be moved later ) 
 
- -- Jeff Becker (probably not evil) <jeff@i2p.rocks>  Thu, 16 Aug 2018 10:57:57 -0400
+  * snap network namespace isolation, untested
+
+ -- jeff <jeff@desu>  Sun, 26 Aug 2018 09:04:09 -0400
 
 lokinet (0.0.2) xenial; urgency=low
 

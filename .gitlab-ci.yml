@@ -12,7 +12,7 @@ build:linux:
     - linux
   stage: build
   before_script:
-    - apk add --update g++ make cmake automake libtool autoconf linux-headers
+    - apk add --update g++ make cmake automake libtool autoconf linux-headers libcap-dev
   script:
     - make
   artifacts:

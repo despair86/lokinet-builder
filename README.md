@@ -9,7 +9,7 @@ this repo is a recursive repo for building lokinet with all of the required libr
 ## building on linux for linux
 
     # or your OS or distro's package manager
-    $ sudo apt install build-essential libtool autoconf cmake git
+    $ sudo apt install build-essential libtool autoconf cmake git libcap-dev
     $ git clone --recursive https://github.com/loki-project/lokinet-builder
     $ cd lokinet-builder
     $ make 
@@ -23,7 +23,7 @@ this repo is a recursive repo for building lokinet with all of the required libr
 
 ## building the debian package
 
-    $ sudo apt install devscripts build-essential libtool autoconf cmake git
+    $ sudo apt install devscripts build-essential libtool autoconf cmake git libcap-dev
     $ git clone --recursive https://github.com/loki-project/lokinet-builder
     $ cd lokinet-builder
     $ debuild -b -us -uc
