@@ -43,4 +43,4 @@ lokinet (0.2.1) UNRELEASED; urgency=medium
 
   * snap network namespace isolation, untested
 
- -- jeff <jeff@desu>  Sat, 08 Sep 2018 12:53:41 -0400
+ -- jeff <jeff@i2p.rocks>  Sat, 08 Sep 2018 12:53:41 -0400
