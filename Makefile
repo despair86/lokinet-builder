@@ -64,7 +64,7 @@ static-sodium: static-sodium-configure
 	$(MAKE) -C $(SODIUM_BUILD) install CFLAGS=-fPIC
 
 static: static-sodium
-	cd $(BUILD_DIR) && cmake $(LLARPD_SRC) -DSODIUM_LIBRARIES=$(SODIUM_LIB) -DSODIUM_INCLUDE_DIR=$(DEP_PREFIX)/include -DSTATIC_LINK=ON 
+	cd $(BUILD_DIR) && cmake $(LLARPD_SRC) -DSODIUM_LIBRARIES=$(SODIUM_LIB) -DSODIUM_INCLUDE_DIR=$(DEP_PREFIX)/include -DSTATIC_LINK=ON -DTUNTAP=ON
 	$(MAKE) -C $(BUILD_DIR)
 	cp $(BUILD_DIR)/lokinet $(EXE)
 
