@@ -1,4 +1,4 @@
-lokinet (0.2.1) UNRELEASED; urgency=medium
+lokinet (0.2.3) UNRELEASED; urgency=medium
 
   [ Jeff Becker (probably not evil) ]
   * MANDITORY UPGRADE FOR TOYNET
@@ -43,4 +43,16 @@ lokinet (0.2.1) UNRELEASED; urgency=medium
 
   * snap network namespace isolation, untested
 
- -- jeff <jeff@i2p.rocks>  Sat, 08 Sep 2018 12:53:41 -0400
+  [ jeff ]
+
+  * bump versions
+
+  * add lokinet-bootstrap script
+
+  * dns automapping
+
+  * hidden serivce junk
+ 
+  * systemd unit
+
+ -- jeff <jeff@i2p.rocks>  Tue, 25 Sep 2018 09:17:17 -0400
