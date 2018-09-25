@@ -3,6 +3,7 @@ REPO := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 BUILD_DIR=$(REPO)/build
 
 EXE = $(REPO)/lokinet
+RC_EXE = $(REPO)/lokinet-rcutil
 
 DEP_PREFIX=$(BUILD_DIR)/prefix
 PREFIX_SRC=$(DEP_PREFIX)/src
@@ -116,6 +117,7 @@ debian: ensure sodium
 	cd $(BUILD_DIR) && cmake $(LLARPD_SRC) -DSODIUM_LIBRARIES=$(SODIUM_LIB) -DSODIUM_INCLUDE_DIR=$(DEP_PREFIX)/include -G "Unix Makefiles" -DDEBIAN=ON -DTUNTAP=ON -DRELEASE_MOTTO="$(shell cat $(LLARPD_SRC)/motto.txt)"
 	$(MAKE) -C $(BUILD_DIR)
 	cp $(BUILD_DIR)/lokinet $(EXE)
+	cp $(BUILD_DIR)/rcutil $(RC_EXE)
 
 cross-sodium: ensure
 	cd $(SODIUM_SRC) && $(SODIUM_SRC)/autogen.sh

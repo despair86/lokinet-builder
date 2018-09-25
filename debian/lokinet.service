@@ -1,0 +1,14 @@
+[Unit]
+Description=LokiNET: Anonymous Network layer thingydoo.
+Wants=network.target
+After=network.target
+
+[Service]
+User=debian-lokinet
+SyslogIdentifier=lokinet
+ExecStartPre=/bin/bash -e "[ -d $HOME/.lokinet/ ] || ( /usr/sbin/lokinet -g && /usr/sbin/lokinet-bootstrap ) "
+ExecStart=/usr/sbin/lokinet
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -6,13 +6,12 @@
 
 this repo is a recursive repo for building lokinet with all of the required libraries bundled as git submodules
 
-## building on linux for linux
+## building the debian package
 
-    # or your OS or distro's package manager
-    $ sudo apt install build-essential libtool autoconf cmake git libcap-dev
+    $ sudo apt install devscripts build-essential libtool autoconf cmake git libcap-dev wget
     $ git clone --recursive https://github.com/loki-project/lokinet-builder
     $ cd lokinet-builder
-    $ make 
+    $ debuild -b -us -uc
 
 ## cross compile on linux for windows
     
@@ -21,10 +20,36 @@ this repo is a recursive repo for building lokinet with all of the required libr
     $ cd lokinet-builder
     $ make windows
 
-## building the debian package
+# running
 
-    $ sudo apt install devscripts build-essential libtool autoconf cmake git libcap-dev
-    $ git clone --recursive https://github.com/loki-project/lokinet-builder
-    $ cd lokinet-builder
-    $ debuild -b -us -uc
+Install the debian package, build the debian package manually if you want optimizations compiled in.
+
+if the machine you run lokinet on has a public address (at the moment) it `will` automatically become a relay, 
+otherwise it will run in client mode.
+
+
+**NEVER** run lokinet as root.
+
+to set up a lokinet to start on boot:
+
+    # systemctl enable --now lokinet.service
+
+alternatively:
+
+set up the configs and bootstrap (first time only):
+
+    $ lokinet -g && lokinet-bootstrap
     
+run it (foreground):
+    
+    $ lokinet
+
+to force client mode edit `/var/lib/lokinet/.lokinet/daemon.ini` or `$HOME/.lokinet/daemon.ini`
+
+comment out the `[bind]` section, so it looks like this:
+
+    ...
+    
+    # [bind]
+    # eth0=1090
+
