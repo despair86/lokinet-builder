@@ -44,7 +44,7 @@ run it (foreground):
     
     $ lokinet
 
-to force client mode edit `/var/lib/lokinet/.lokinet/daemon.ini` or `$HOME/.lokinet/daemon.ini`
+to force client mode edit `/var/lib/lokinet/.lokinet/lokinet.ini` or `$HOME/.lokinet/daemon.ini`
 
 comment out the `[bind]` section, so it looks like this:
 
