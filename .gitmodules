@@ -1,8 +1,8 @@
-[submodule "deps/sodium"]
-	path = deps/sodium
-	url = git@github.com:despair86/libsodium.git
-	branch = lokinet-vendored
 [submodule "deps/llarp"]
 	path = deps/llarp
-	url = git@github.com:despair86/loki-network.git
+	url = https://github.com/despair86/loki-network.git
 	branch = master
+[submodule "deps/sodium"]
+	path = deps/sodium
+	url = https://github.com/despair86/libsodium.git
+	branch = lokinet-vendored
