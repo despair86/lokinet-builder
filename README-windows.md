@@ -15,24 +15,7 @@
 
 ## Building on Windows using Microsoft C/C++ (Visual Studio 2017)
 
-* clone https://github.com/loki-project/lokinet-builder from git-bash or whatever git browser you use
-* open `%CLONE_PATH%/lokinet-builder/deps/sodium/builds/msvc/vs2017/libsodium.sln` and build one of the targets
-* create a `build` folder in `%CLONE_PATH%/lokinet-builder`
-* run cmake-gui from `%CLONE_PATH%/lokinet-builder/deps/llarp` as the source directory
-  * define `SODIUM_LIB`  to `%CLONE_PATH%/lokinet-builder/deps/sodium/bin/win32/%CONFIG%/%TOOLSET%/%TARGET%/libsodium.lib`
-  * define `SODIUM_INCLUDE_DIR` to `%CLONE_PATH%/lokinet-builder/deps/sodium/src/libsodium/include`
-  * define `HAVE_CXX17_FILESYSTEM` to `TRUE`
-  * select `Visual Studio 2017 15 %ARCH%` as the generator
-  * enter a custom toolset if desired (usually `v141_xp`)
-* generate the developer studio project files and open in the IDE
-* select a configuration
-* press F7 to build everything
-
-to run:
-
-    $ ./lokinet
-
-or press `Debug`/`Local Windows Debugger` in the visual studio standard toolbar
+- Microsoft C/C++ is unsupported, the codebase has a lot of POSIX functions, and MinGW-w64 implements enough of them to make the win32 port possible
 
 ## Boxed warning
 
