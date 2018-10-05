@@ -21,9 +21,36 @@
 
 - Microsoft C/C++ is unsupported, the codebase has a lot of POSIX functions, and MinGW-w64 implements enough of them to make the win32 port possible
 
-## Boxed warning
+## running
 
-Server/inbound sessions are not supported at this time. (The code is there, but it has not been fully tested.)
-_If you **insist**, get msys2 or cygwin and follow the linux build instructions, your mileage *will* vary greatly._
+if the machine you run lokinet on has a public address (at the moment) it `will` automatically become a relay, 
+otherwise it will run in client mode.
+
+
+**NEVER** run lokinet under elevation.
+
+to set up a lokinet to start on boot:
+
+    C:\> (not ready yet. TODO: write up some SCM install code in the win32 setup)
+
+alternatively:
+
+set up the configs and bootstrap (first time only):
+
+    C:\> lokinet -g && lokinet-bootstrap.bat
+    
+run it (foreground):
+    
+    C:\> lokinet
+
+to force client mode edit `$APPDATA/.lokinet/daemon.ini`
+
+comment out the `[bind]` section, so it looks like this:
+
+    ...
+    
+    # [bind]
+    # {B7F2ECAC-BB10-4736-8BBD-6E9444E27030}=1090
+
 
 -despair
