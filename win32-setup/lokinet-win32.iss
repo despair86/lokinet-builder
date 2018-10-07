@@ -4,10 +4,10 @@
 #define MyAppName "loki-network"
 #define MyAppVersion "0.0.3"
 #define MyAppPublisher "Loki Project"
-#define MyAppURL "https://loki.project"
+#define MyAppURL "https://loki.network"
 #define MyAppExeName "lokinet.exe"
 ; change this to avoid compiler errors  -despair
-#define DevPath "D:\dev\llarpd-builder\"
+#define DevPath "D:\dev\external\llarpd-builder\"
 #include <idp.iss>
 
 ; inno setup script ©2018 rick v for loki project
@@ -57,19 +57,9 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
+; we're grabbing the builds from jenkins-ci now, which are fully linked
 Source: "{#DevPath}build\lokinet.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#DevPath}daemon.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#DevPath}build\dns.exe"; DestDir: "{app}"; Flags: ignoreversion
-; comment these for 64-bit builds
-Source: "{#DevPath}build\libgcc_s_sjlj-1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#DevPath}build\libstdc++-6.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#DevPath}build\libwinpthread-1.dll"; DestDir: "{app}"; Flags: ignoreversion
-; end
-; uncomment these for 64-bit builds
-;Source: "{#DevPath}build\libgcc_s_seh-1.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#DevPath}build\libstdc++-6.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "{#DevPath}build\libwinpthread-1.dll"; DestDir: "{app}"; Flags: ignoreversion
-; end
 Source: "{#DevPath}build\llarpc.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#DevPath}build\rcutil.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; delet this after finishing setup, we only need it to extract the drivers
