@@ -8,6 +8,7 @@ This is a tiny executable that does the same thing as the `lokinet-bootstrap` sh
 
 - mbedtls 2.13.0 or later, for both host and windows
 - wget for host (to download Netscape CA bundle from cURL website)
+- Also included is a patch that can be applied to the mbedtls source to enable features like AES-NI in protected mode, plus some networking fixes for win32
 
 native build:
 
