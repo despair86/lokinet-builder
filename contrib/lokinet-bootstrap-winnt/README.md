@@ -4,6 +4,11 @@ This is a tiny executable that does the same thing as the `lokinet-bootstrap` sh
 
 # Building
 
+## requirements
+
+- mbedtls 2.13.0 or later, for both host and windows
+- wget for host (to download Netscape CA bundle from cURL website)
+
 native build:
 
     $ export INCLUDE=/mingw32/include LIBS=/mingw32/lib # or a different path
@@ -20,7 +25,7 @@ cross-compile build:
     $ export WINNT_INCLUDE=/path/to/win32/headers WINNT_LIBS=/path/to/win32/libs
     $ make prepare;make lokinet-bootstrap
 
-then run `lokinet-bootstrap` to download an initial RC.
+then run `lokinet-bootstrap` on windows to download an initial RC.
 
 this may be included in the installation package in the future.
 

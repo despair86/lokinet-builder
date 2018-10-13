@@ -21,10 +21,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-# include <io.h>
-# include <fcntl.h>
+#include "sysconf.h"
+#ifdef HAVE_SETMODE
 # define SET_BINARY_MODE(handle) setmode(handle, O_BINARY)
-
+#else
+# define SET_BINARY_MODE(handle) ((void)0)
+#endif
 #include <mbedtls/base64.h>
 #include <mbedtls/error.h>
 
