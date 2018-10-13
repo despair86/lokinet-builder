@@ -24,7 +24,7 @@ if the machine you run lokinet on has a public address (at the moment) it `will`
 otherwise it will run in client mode.
 
 
-**NEVER** run lokinet under elevation.
+**NEVER** run lokinet with elevated privileges.
 
 to set up a lokinet to start on boot:
 
@@ -34,7 +34,7 @@ alternatively:
 
 set up the configs and bootstrap (first time only):
 
-    C:\> lokinet -g && lokinet-bootstrap.bat
+    C:\> lokinet -g && lokinet-bootstrap
     
 run it (foreground):
     
