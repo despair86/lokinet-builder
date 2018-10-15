@@ -52,6 +52,7 @@ ensure: clean
 	mkdir -p $(DEP_PREFIX)
 	mkdir -p $(PREFIX_SRC)
 	mkdir -p $(SODIUM_BUILD)
+	mkdir -p $(DEB_BUILD_DIR)
 
 sodium-configure: ensure
 	cd $(SODIUM_SRC) && $(SODIUM_SRC)/autogen.sh
@@ -125,7 +126,7 @@ android: android-gradle
 
 debian: ensure sodium
 	cd $(DEB_BUILD_DIR) && cmake $(LLARPD_SRC) -DSODIUM_LIBRARIES=$(SODIUM_LIB) -DSODIUM_INCLUDE_DIR=$(DEP_PREFIX)/include -G "Unix Makefiles" -DDEBIAN=ON -DRELEASE_MOTTO="$(shell cat $(LLARPD_SRC)/motto.txt)" -DCMAKE_BUILD_TYPE=Release
-	$(MAKE) -C $(BUILD_DIR)
+	$(MAKE) -C $(DEB_BUILD_DIR)
 	cp $(DEB_BUILD_DIR)/lokinet $(EXE)
 	cp $(DEB_BUILD_DIR)/rcutil $(RC_EXE)
 
