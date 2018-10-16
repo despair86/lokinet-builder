@@ -2193,9 +2193,11 @@ static const unsigned char ca_cert_store_encoded[] =
 
 bool initTLS()
 {
-	int inf_status,r,out;
+	int inf_status,r;
+	size_t out;
 	unsigned long inf_len;
 	HCRYPTPROV hprovider;
+	unsigned char* tmp;
 	char str[512], seed[64];
 
 	mbedtls_net_init(&server_fd);
@@ -2205,12 +2207,12 @@ bool initTLS()
 	mbedtls_entropy_init(&entropy);
 	mbedtls_ctr_drbg_init(&ctr_drbg);
 
-	unsigned char* tmp = malloc(524288);
+	tmp = malloc(524288);
 
-	r = mbedtls_base64_decode(tmp, 524288, &out, ca_cert_store_encoded, strlen(ca_cert_store_encoded));
+	r = mbedtls_base64_decode(tmp, 524288, &out, ca_cert_store_encoded, sizeof(ca_cert_store_encoded)-1);
 	if (r)
 	{
-		mbedtls_strerror(r, tmp, 524288);
+		mbedtls_strerror(r, (char*)tmp, 524288);
 		printf("decoding failed: %s\n", tmp);
 		free(tmp);
 		return false;
@@ -2271,7 +2273,7 @@ char** argv;
 	if (version < 0x80000000)
 		build = (DWORD)(HIWORD(version));
 	ua = malloc(512);
-	rq = malloc(1024);
+	rq = malloc(4096);
 	snprintf(ua, 512, "%s%d.%d", userAgent, major, minor);
 
 	printf("connecting to http://i2p.rocks/...");
@@ -2322,7 +2324,7 @@ char** argv;
 	printf("\nDownloading i2procks.signed...");
 	snprintf(rq, 512, "%sHost: i2p.rocks\r\nUser-Agent: %s\r\n\r\n", request, ua);
 	//printf("%s",rq);
-	while ((r = mbedtls_ssl_write(&ssl, rq, strlen(rq))) <= 0)
+	while ((r = mbedtls_ssl_write(&ssl, (unsigned char*)rq, strlen(rq))) <= 0)
 	{
 		if (r != MBEDTLS_ERR_SSL_WANT_READ && r != MBEDTLS_ERR_SSL_WANT_WRITE)
 		{
@@ -2333,7 +2335,7 @@ char** argv;
 	memset(rq, 0, 1024);
 	len = 0;
 	do {
-		r = mbedtls_ssl_read(&ssl, buf, 512);
+		r = mbedtls_ssl_read(&ssl, (unsigned char*)buf, 512);
 		if (r <= 0) {
 			break;
 		}
@@ -2347,6 +2349,7 @@ char** argv;
 	if (!strstr(rq, "200 OK"))
 	{
 		printf("An error occurred.\n");
+		printf("Server response:\n%s", rq);
 		goto exit;
 	}
 	snprintf(path, MAX_PATH, "%s\\.lokinet\\bootstrap.signed", getenv("APPDATA"));

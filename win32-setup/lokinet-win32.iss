@@ -63,6 +63,8 @@ Source: "{#DevPath}build\dns.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#DevPath}build\llarpc.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#DevPath}build\rcutil.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; delet this after finishing setup, we only need it to extract the drivers
+; and download an initial RC
+Source: "{#DevPath}lokinet-bootstrap.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: "{#DevPath}win32-setup\7z.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 ; Copy the correct tuntap driver for the selected platform
 Source: "{tmp}\tuntapv9.7z"; DestDir: "{app}"; Flags: ignoreversion external; OnlyBelowVersion: 0, 6.0
