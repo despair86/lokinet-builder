@@ -28,7 +28,7 @@ cross-compile build:
 
 # Usage
 
-   C:\>lokinet-bootstrap [uri] [local download path]
+    C:\>lokinet-bootstrap [uri] [local download path]
 
 this is also included in the lokinet installer package.
 
