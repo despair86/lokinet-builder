@@ -26,8 +26,10 @@ cross-compile build:
     $ export WINNT_INCLUDE=/path/to/win32/headers WINNT_LIBS=/path/to/win32/libs
     $ make prepare;make lokinet-bootstrap
 
-then run `lokinet-bootstrap` on windows to download an initial RC.
+# Usage
 
-this may be included in the installation package in the future.
+   C:\>lokinet-bootstrap [uri] [local download path]
+
+this is also included in the lokinet installer package.
 
 -despair86
