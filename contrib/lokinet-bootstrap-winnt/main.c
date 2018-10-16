@@ -43,8 +43,10 @@ mbedtls_ssl_config conf;
 mbedtls_x509_crt cacert;
 unsigned char* ca_certs;
 
-static const char* request = "GET /i2procks.signed HTTP/1.0\r\n";
+/* imageboard ref just because */
 static char userAgent[] = "NetRunner_Micro/0.1 PolarSSL/2.13.0;U;Windows NT ";
+
+/* netscape ca bundle */
 static const unsigned char ca_cert_store_encoded[] = 
 "eAG8/Umy48izPYzNsYoy00CSUd+fREcQMtMAfUMCJPpmIkNH9A3RA7vQErQAbUBTmfal4M0+K7Oy"
 "fu+9T2mVdW+CIBEAI9yPn+Ph/n/4P0D/h//DX/TUxFXyV/v8i6H+0tt2/ItJ+jF/5lEwJgM4433S"
@@ -2191,6 +2193,17 @@ static const unsigned char ca_cert_store_encoded[] =
 "pqLPvscxpRcQeVwScZEM7ejGcLtfoecWYaHx+nSHDilOO8UVeX81jha9ckJrgIaUEen99unjsCSN"
 "vNycvRG7E2hCmn1FjzkK37f8UhIsyBZNtyX2X3sl/29r4Xgw";
 
+typedef struct url_parser_url 
+{
+	char *protocol;
+	char *host;
+	int port;
+	char *path;
+	char *query_string;
+	int host_exists;
+	char *host_ip;
+} url_parser_url_t;
+
 bool initTLS()
 {
 	int inf_status,r;
@@ -2217,7 +2230,7 @@ bool initTLS()
 		free(tmp);
 		return false;
 	}
-	// inflate ca certs, they are still compressed
+	/* inflate ca certs, they are still compressed */
 	ca_certs = malloc(524288);
 	inf_len = 524288;
 
@@ -2250,15 +2263,150 @@ bool initTLS()
 	return true;
 }
 
+void free_parsed_url(url_parsed)
+url_parser_url_t *url_parsed;
+{
+	if (url_parsed->protocol)
+		free(url_parsed->protocol);
+	if (url_parsed->host)
+		free(url_parsed->host);
+	if (url_parsed->path)
+		free(url_parsed->path);
+	if (url_parsed->query_string)
+		free(url_parsed->query_string);
+
+	free(url_parsed);
+}
+
+parse_url(url, verify_host, parsed_url) 
+char *url;
+bool verify_host;
+url_parser_url_t *parsed_url;
+{
+	char *local_url;
+	char *token;
+	char *token_host;
+	char *host_port;
+	char *host_ip;
+
+	char *token_ptr;
+	char *host_token_ptr;
+
+	char *path = NULL;
+
+	/* Copy our string */
+	local_url = strdup(url);
+
+	token = strtok_r(local_url, ":", &token_ptr);
+	parsed_url->protocol = strdup(token);
+
+	/* Host:Port */
+	token = strtok_r(NULL, "/", &token_ptr);
+	if (token) 
+		host_port = strdup(token);
+	else
+		host_port = (char *) calloc(1, sizeof(char));
+
+	token_host = strtok_r(host_port, ":", &host_token_ptr);
+	parsed_url->host_ip = NULL;
+	if (token_host) {
+		parsed_url->host = strdup(token_host);
+
+		if (verify_host) {
+			struct hostent *host;
+			host = gethostbyname(parsed_url->host);
+			if (host != NULL) {
+				parsed_url->host_ip = inet_ntoa(* (struct in_addr *) host->h_addr);
+				parsed_url->host_exists = 1;
+			} else {
+				parsed_url->host_exists = 0;
+			}
+		} else {
+			parsed_url->host_exists = -1;
+		}
+	} else {
+		parsed_url->host_exists = -1;
+		parsed_url->host = NULL;
+	}
+
+	/* Port */
+	token_host = strtok_r(NULL, ":", &host_token_ptr);
+	if (token_host)
+		parsed_url->port = atoi(token_host);
+	else
+		parsed_url->port = 0;
+
+	token_host = strtok_r(NULL, ":", &host_token_ptr);
+	assert(token_host == NULL);
+
+	token = strtok_r(NULL, "?", &token_ptr);
+	parsed_url->path = NULL;
+	if (token) {
+		path = (char *) realloc(path, sizeof(char) * (strlen(token) + 2));
+		memset(path, 0, sizeof(char) * (strlen(token)+2));
+		strcpy(path, "/");
+		strcat(path, token);
+
+		parsed_url->path = strdup(path);
+
+		free(path);
+	} else {
+		parsed_url->path = (char *) malloc(sizeof(char) * 2);
+		strcpy(parsed_url->path, "/");
+	}
+
+	token = strtok_r(NULL, "?", &token_ptr);
+	if (token) {
+		parsed_url->query_string = (char *) malloc(sizeof(char) * (strlen(token) + 1));
+		strncpy(parsed_url->query_string, token, strlen(token));
+	} else {
+		parsed_url->query_string = NULL;
+	}
+
+	token = strtok_r(NULL, "?", &token_ptr);
+	assert(token == NULL);
+
+	free(local_url);
+	free(host_port);
+	return 0;
+}
+
+connect_insecure(uri)
+url_parser_url_t *uri;
+{
+	/* TODO: insecure connect sequence */
+	return 0;
+}
 
 main(argc, argv)
-char** argv;
+char** argv; /* It never occurred to me that this was writable to begin with... */
 {
 	DWORD version, major, minor, build, flags;
 	int r, len;
-	FILE* bootstrapRC;
-	char path[MAX_PATH], buf[512];
-	char* ua, *rq, *resp;
+	FILE *bootstrapRC;
+	char path[MAX_PATH], buf[512], port[8];
+	char *ua, *rq, *resp, *uri, *savePath;
+	url_parser_url_t *parsed_uri;
+
+	if (argc == 1)
+	{
+		printf("Usage: %s [uri] [savepath]\n", argv[0]);
+		return 1;
+	}
+
+	if (argc >= 3)
+	{
+		uri = argv[1];
+		savePath = argv[2];
+		parsed_uri = malloc(sizeof(url_parser_url_t));
+		memset(parsed_uri, 0, sizeof(url_parser_url_t));
+		r = parse_url(uri, false, parsed_uri);
+		if (r)
+		{
+			printf("Invalid URI pathspec\n");
+			return -1;
+		}
+	}
 
 	if (!initTLS())
 	{
@@ -2266,7 +2414,7 @@ char** argv;
 		return -1;
 	}
 	
-	// fill in user-agent string
+	/* fill in user-agent string */
 	version = GetVersion();
 	major = (DWORD)(LOBYTE(LOWORD(version)));
 	minor = (DWORD)(HIBYTE(LOWORD(version)));
@@ -2276,13 +2424,29 @@ char** argv;
 	rq = malloc(4096);
 	snprintf(ua, 512, "%s%d.%d", userAgent, major, minor);
 
-	printf("connecting to http://i2p.rocks/...");
-	r = mbedtls_net_connect(&server_fd, "i2p.rocks", "443", MBEDTLS_NET_PROTO_TCP);
+	/* get host name, set port if blank */
+	if (!strcmp("https", parsed_uri->protocol) && !parsed_uri->port)
+		parsed_uri->port = 443;
+	if (!strcmp("http", parsed_uri->protocol) && !parsed_uri->port)
+		parsed_uri->port = 80;
+
+	printf("connecting to %s on port %d...",parsed_uri->host, parsed_uri->port);
+	sprintf(port, "%d", parsed_uri->port);
+	r = mbedtls_net_connect(&server_fd, parsed_uri->host, port, MBEDTLS_NET_PROTO_TCP);
 	if (r)
 	{
-		printf("error - failed to connect to bootstrap server: %d\n", r);
+		printf("error - failed to connect to server: %d\n", r);
 		goto exit;
 	}
+
+	/* ok this is where the secure vs insecure stuff splits off */
+	if (strcmp(parsed_uri->protocol, "https"))
+	{
+		r = connect_insecure(parsed_uri);
+		goto exit;
+	}
+
+	/* HTTPS sequence */
 	r = mbedtls_ssl_config_defaults(&conf, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT);
 	if (r)
 	{
@@ -2298,7 +2462,7 @@ char** argv;
 		printf("error - failed to setup TLS session: %d\n", r);
 		goto exit;
 	}
-	r = mbedtls_ssl_set_hostname(&ssl, "i2p.rocks");
+	r = mbedtls_ssl_set_hostname(&ssl, parsed_uri->host);
 	if (r)
 	{
 		printf("error - failed to perform SNI: %d\n", r);
@@ -2321,9 +2485,8 @@ char** argv;
 		printf("%s\n", vrfy_buf);
 		goto exit;
 	}
-	printf("\nDownloading i2procks.signed...");
-	snprintf(rq, 512, "%sHost: i2p.rocks\r\nUser-Agent: %s\r\n\r\n", request, ua);
-	//printf("%s",rq);
+	printf("\nDownloading %s...", &parsed_uri->path[1]);
+	snprintf(rq, 512, "GET %s HTTP/1.0\r\nHost: %s\r\nUser-Agent: %s\r\n\r\n", parsed_uri->path, parsed_uri->host, ua);
 	while ((r = mbedtls_ssl_write(&ssl, (unsigned char*)rq, strlen(rq))) <= 0)
 	{
 		if (r != MBEDTLS_ERR_SSL_WANT_READ && r != MBEDTLS_ERR_SSL_WANT_WRITE)
@@ -2352,7 +2515,7 @@ char** argv;
 		printf("Server response:\n%s", rq);
 		goto exit;
 	}
-	snprintf(path, MAX_PATH, "%s\\.lokinet\\bootstrap.signed", getenv("APPDATA"));
+	snprintf(path, MAX_PATH, savePath);
 	resp = strstr(rq, "Content-Length");
 	r = strcspn(resp, "0123456789");
 	snprintf(buf, 4, "%s", &resp[r]);
@@ -2377,5 +2540,6 @@ exit:
 	free(ua);
 	free(rq);
 	free(ca_certs);
+	free_parsed_url(parsed_uri);
 	return r;
 }
