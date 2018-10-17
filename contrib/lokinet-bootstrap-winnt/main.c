@@ -25,7 +25,7 @@
 #include <wincrypt.h>
 #include "miniz.h"
 
-// PolarSSL
+/* PolarSSL */
 #include <mbedtls/ssl.h>
 #include <mbedtls/entropy.h>
 #include <mbedtls/ctr_drbg.h>
@@ -34,7 +34,7 @@
 #include <mbedtls/certs.h>
 #include <mbedtls/base64.h>
 
-// PolarSSL internal state
+/* PolarSSL internal state */
 mbedtls_net_context server_fd;
 mbedtls_entropy_context entropy;
 mbedtls_ctr_drbg_context ctr_drbg;
@@ -2371,11 +2371,64 @@ url_parser_url_t *parsed_url;
 	return 0;
 }
 
-connect_insecure(uri)
+connect_insecure(uri, ua, savePath)
 url_parser_url_t *uri;
+char *ua, *savePath;
 {
-	/* TODO: insecure connect sequence */
-	return 0;
+	int r, len;
+	FILE *bootstrapRC;
+	char rq[4096] = { 0 };
+	char buf[512] = { 0 };
+	char path[MAX_PATH] = { 0 };
+	char *resp;
+
+	printf("\nDownloading %s...", &uri->path[1]);
+	snprintf(rq, 512, "GET %s HTTP/1.0\r\nHost: %s\r\nUser-Agent: %s\r\n\r\n", uri->path, uri->host, ua);
+	while ((r = mbedtls_net_send(&ssl, (unsigned char*)rq, strlen(rq))) <= 0)
+	{
+		if (r != MBEDTLS_ERR_SSL_WANT_READ && r != MBEDTLS_ERR_SSL_WANT_WRITE)
+		{
+			printf("failed! error %d\n\n", r);
+			return r;
+		}
+	}
+	memset(rq, 0, 4096);
+	len = 0;
+	do {
+		r = mbedtls_net_recv(&ssl, (unsigned char*)buf, 512);
+		if (r <= 0)
+			break;
+		else 
+		{
+			strncat(rq, buf, r);
+			len += r;
+		}
+	} while (r);
+	printf("%d bytes downloaded to core.\n", len);
+
+	if (!strstr(rq, "200 OK"))
+	{
+		printf("An error occurred.\n");
+		printf("Server response:\n%s", rq);
+		/* TODO: extract HTTP error code and return that instead */
+		return -1;
+	}
+
+	snprintf(path, MAX_PATH, savePath);
+	resp = strstr(rq, "Content-Length");
+	r = strcspn(resp, "0123456789");
+	snprintf(buf, 4, "%s", &resp[r]);
+	r = atoi(buf);
+	resp = strstr(rq, "\r\n\r\n");
+	snprintf(buf, r, "%s", &resp[4]);
+	printf("Writing %s...\n", path);
+	bootstrapRC = fopen(path, "wb");
+	fwrite(buf, 1, r, bootstrapRC);
+	fclose(bootstrapRC);
+
+	r = 0;
+
+	return r;
 }
 
 main(argc, argv)
@@ -2442,7 +2495,7 @@ char** argv; /* It never occurred to me that this was writable to begin with... 
 	/* ok this is where the secure vs insecure stuff splits off */
 	if (strcmp(parsed_uri->protocol, "https"))
 	{
-		r = connect_insecure(parsed_uri);
+		r = connect_insecure(parsed_uri, ua, savePath);
 		goto exit;
 	}
 
@@ -2495,18 +2548,18 @@ char** argv; /* It never occurred to me that this was writable to begin with... 
 			goto exit;
 		}
 	}
-	memset(rq, 0, 1024);
+	memset(rq, 0, 4096);
 	len = 0;
 	do {
 		r = mbedtls_ssl_read(&ssl, (unsigned char*)buf, 512);
-		if (r <= 0) {
+		if (r <= 0)
 			break;
-		}
-		else {
+		else 
+		{
 			strncat(rq, buf, r);
 			len += r;
 		}
-	} while (r != 0);
+	} while (r);
 	printf("%d bytes downloaded to core.\n", len);
 	mbedtls_ssl_close_notify(&ssl);
 	if (!strstr(rq, "200 OK"))
