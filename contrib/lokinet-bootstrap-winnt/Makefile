@@ -37,11 +37,11 @@ prepare: zpipe base64enc download
 	./base64enc < data.enc > out.bin
 	sed -ie "s/.\{76\}/&\n/g" out.bin
 	sed -i 's/.*/\"&\"/g' out.bin
-	sed -i '51,2194d' main.c
+	sed -i '49,2192d' bootstrap.c
 	echo ';' >> out.bin
-	sed -i '50r out.bin' main.c
+	sed -i '48r out.bin' bootstrap.c
 
-lokinet-bootstrap: main.o miniz.o
+lokinet-bootstrap: bootstrap.o miniz.o
 	$(CC) $(WINNT_LIBS) -static -s $^ -o $@.exe -lmbedx509 -lmbedtls -lmbedcrypto -lws2_32
 
 clean:
