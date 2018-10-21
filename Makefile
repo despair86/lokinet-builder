@@ -5,7 +5,7 @@ BUILD_DIR_BASE=$(REPO)/build
 EXE = $(REPO)/lokinet
 RC_EXE = $(REPO)/lokinet-rcutil
 
-DEP_PREFIX=$(BUILD_DIR)/prefix
+DEP_PREFIX=$(BUILD_DIR_BASE)/prefix
 PREFIX_SRC=$(DEP_PREFIX)/src
 
 SODIUM_SRC=$(REPO)/deps/sodium
